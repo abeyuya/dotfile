@@ -1,5 +1,5 @@
 # 環境切り分け用
-/zsh/homedir
+/zsh/zshrc_homedir
 /zsh/path.zsh
 
 # vim
