@@ -5,7 +5,7 @@ function loadlib() {
       . "$lib"
   fi
 }
-loadlib ./.zshrc_homedir
+loadlib $HOME/.zshrc_homedir
 
 # zshディレクトリの *.zsh ファイルをすべて読み込む
 if [ -d $ZSHHOME -a -r $ZSHHOME -a -x $ZSHHOME ]; then

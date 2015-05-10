@@ -4,24 +4,6 @@
 
 """"""""""""""""""""""""""""""""""""""""""""""
 "
-" ノーマルモード
-"
-""""""""""""""""""""""""""""""""""""""""""""""
-
-" 画面移動
-" noremap <C-n> <C-e>
-" noremap <C-p> <C-y>
-
-" 行頭,行末,削除
-" noremap <C-a> ^
-" noremap <C-e> $
-" noremap <C-d> <Del>
-" noremap <C-k> C <esc>
-
-
-
-""""""""""""""""""""""""""""""""""""""""""""""
-"
 " 挿入モード
 "
 """"""""""""""""""""""""""""""""""""""""""""""
@@ -40,11 +22,9 @@ inoremap %% %%<Left>
 
 """Myjumpto function
 
-let jump_path = './functions/in_Myjumpto.vim'
-if filereadable(expand(jump_path))
-    source jump_path
+if filereadable(expand("./functions/in_Myjumpto.vim"))
+  source ./functions/in_Myjumpto.vim
 endif
-unlet jump_path
 
 "行末まで削除
 inoremap <expr> <C-k> "\<C-g>u".(col('.') == col('$') ? '<C-o>gJ' : '<C-o>D')
@@ -172,11 +152,9 @@ nnoremap <C-h> :pop<CR>
 " Save file
 """"""""""""""""""""
 
-let save_path = './functions/savefile.vim'
-if filereadable(expand(save_path))
-    source save_path
+if filereadable(expand('./functions/savefile.vim'))
+    source ./functions/savefile.vim
 endif
-unlet save_path
 
 
 """"""""""""""""""""""""""""""""""""""""""""""
@@ -187,11 +165,9 @@ unlet save_path
 
 """Using vundle
 
-let vundle_path = './functions/vundle.vim'
-if filereadable(expand(vundle_path))
-    source vundle_path
+if filereadable(expand('./functions/vundle.vim'))
+    source ./functions/vundle.vim
 endif
-unlet vundle_path
 
 """""""""""""""""""
 " newcomplcache
@@ -225,8 +201,6 @@ let g:html_indent_style1  = "inc"
 " syntax
 """""""""
 
-let vagrant_path = './functions/vagrant.vim'
-if filereadable(expand(vagrant_path))
-    source vagrant_path
+if filereadable(expand('./functions/vagrant.vim'))
+    source ./functions/vagrant.vim
 endif
-unlet vagrant_path
