@@ -1,0 +1,13 @@
+[user]
+  name = abeyuya
+  email = yuya.abe.0525@gmail.com
+[color]
+  ui = true
+[core]
+  excludesfile = /Users/abeyuya/.gitignore
+[alias]
+  loga = log --graph --all --color --pretty='%x09%h %cn%x09%s %Cred%d%Creset'
+[filter "media"]
+  clean = git media clean %f
+  smudge = git media smudge %f
+  required = true
