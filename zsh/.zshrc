@@ -5,7 +5,7 @@ function loadlib() {
       . "$lib"
   fi
 }
-loadlib ./zsh/homedir
+loadlib ./homedir
 
 
 # zshディレクトリの *.zsh ファイルをすべて読み込む
