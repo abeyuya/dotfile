@@ -1,2 +1,6 @@
+# 環境切り分け用
 /zsh/homedir
 /zsh/path.zsh
+
+# vim
+/vim/bundle/*
