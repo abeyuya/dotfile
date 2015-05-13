@@ -1,34 +1,34 @@
 " Include only
 
 
-if filereadable(expand("./functions/config.vim"))
-  source ./functions/config.vim
+if filereadable(expand("~/Documents/dev/dotfile/vim/functions/config.vim"))
+  source ~/Documents/dev/dotfile/vim/functions/config.vim
 endif
 
 
 """Myjumpto function
-" if filereadable(expand("./functions/in_Myjumpto.vim"))
-"   source ./functions/in_Myjumpto.vim
+" if filereadable(expand("./Documents/dev/dotfile/vim/functions/in_Myjumpto.vim"))
+"   source ./Documents/dev/dotfile/vim/functions/in_Myjumpto.vim
 " endif
 
 
-if filereadable(expand("./functions/indent.vim"))
-  source ./functions/indent.vim
+if filereadable(expand("~/Documents/dev/dotfile/vim/functions/indent.vim"))
+  source ~/Documents/dev/dotfile/vim/functions/indent.vim
 endif
 
 
-if filereadable(expand('./functions/savefile.vim'))
-  source ./functions/savefile.vim
+if filereadable(expand('~/Documents/dev/dotfile/vim/functions/savefile.vim'))
+  source ~/Documents/dev/dotfile/vim/functions/savefile.vim
 endif
 
 
-if filereadable(expand('./functions/vundle.vim'))
-  source ./functions/vundle.vim
+if filereadable(expand('~/Documents/dev/dotfile/vim/functions/vundle.vim'))
+  source ~/Documents/dev/dotfile/vim/functions/vundle.vim
 endif
 
 
-if filereadable(expand('./functions/neocomplcache.vim'))
-  source ./functions/neocomplcache.vim
+if filereadable(expand('~/Documents/dev/dotfile/vim/functions/neocomplcache.vim'))
+  source ~/Documents/dev/dotfile/vim/functions/neocomplcache.vim
 endif
 
 
