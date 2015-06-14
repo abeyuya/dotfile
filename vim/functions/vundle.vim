@@ -1,6 +1,8 @@
 "
 " Using Vundle
 "
+" :BundleInstall
+"
 
 set nocompatible              " be iMproved, required
 filetype off                  " required

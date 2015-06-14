@@ -23,3 +23,21 @@ augroup vagrant
   au BufRead,BufNewFile Vagrantfile set filetype=ruby
   au BufNewFile,BufRead Vagrantfile set tabstop=2 shiftwidth=2
 augroup END
+
+augroup ridgepole
+  au!
+  au BufRead,BufNewFile Schemefile set filetype=ruby
+  au BufNewFile,BufRead Schemefile set tabstop=2 shiftwidth=2
+augroup END
+
+augroup gemfile
+  au!
+  au BufRead,BufNewFile Gemfile set filetype=ruby
+  au BufNewFile,BufRead Gemfile set tabstop=2 shiftwidth=2
+augroup END
+
+augroup markdown
+  au!
+  au BufRead,BufNewFile *.md set filetype=markdown
+  au BufNewFile,BufRead *.md set tabstop=2 shiftwidth=2
+augroup END
