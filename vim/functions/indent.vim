@@ -41,3 +41,9 @@ augroup markdown
   au BufRead,BufNewFile *.md set filetype=markdown
   au BufNewFile,BufRead *.md set tabstop=2 shiftwidth=2
 augroup END
+
+augroup thor
+  au!
+  au BufRead,BufNewFile *.thor set filetype=ruby
+  au BufNewFile,BufRead *.thor set tabstop=2 shiftwidth=2
+augroup END
