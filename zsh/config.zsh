@@ -40,4 +40,5 @@ precmd () {
 }
 RPROMPT="%1(v|%F{green}%1v%f|)"
 
-
+# direnv
+eval "$(direnv hook zsh)"
