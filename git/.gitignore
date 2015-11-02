@@ -1,4 +1,10 @@
 .DS_Store
+
+# rbenv
 .ruby-version
+
+# ctags
 tags
+
+# direnv
 .envrc

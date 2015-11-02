@@ -53,3 +53,9 @@ augroup terraform
   au BufRead,BufNewFile *.tf set filetype=ruby
   au BufNewFile,BufRead *.tf set tabstop=2 shiftwidth=2
 augroup END
+
+augroup podspec
+  au!
+  au BufRead,BufNewFile *.podspec set filetype=ruby
+  au BufNewFile,BufRead *.podspec set tabstop=2 shiftwidth=2
+augroup END

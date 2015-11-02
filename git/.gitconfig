@@ -7,6 +7,7 @@
   excludesfile = /Users/abeyuya/.gitignore
 [alias]
   loga = log --graph --all --color --pretty='%x09%h %cn%x09%s %Cred%d%Creset'
+  reignore = rm -r --cached .
 [filter "media"]
   clean = git media clean %f
   smudge = git media smudge %f
