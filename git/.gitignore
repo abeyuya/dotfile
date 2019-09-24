@@ -11,3 +11,19 @@ tags
 
 # bundler
 .bundle
+
+# docker
+.docker-sync
+
+# npm
+npm-debug.log
+
+# vscode
+.vscode
+
+# android studio
+.idea
+
+# memo
+todo.txt
+

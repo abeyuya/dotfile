@@ -19,15 +19,15 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' # 補完時に大文字小�
 # 現在地表示
 autoload colors
 colors
-PROMPT="%{${fg[yellow]}%}% [~] %{${reset_color}%} $ "
+# PROMPT="%{${fg[yellow]}%}% [~] %{${reset_color}%} $ "
 
 #プロンプト
 autoload colors
 colors
 
 PROMPT="
- %{${fg[yellow]}%}%~%{${reset_color}%} 
-[%n]$ "
+%{${fg[yellow]}%}%~%{${reset_color}%} 
+[%T %n]$ "
 
 # ブランチ表示
 autoload -Uz vcs_info
@@ -42,6 +42,7 @@ RPROMPT="%1(v|%F{green}%1v%f|)"
 
 # direnv
 eval "$(direnv hook zsh)"
+export EDITOR="vim"
 
 # screenと競合しないように
 bindkey -e
