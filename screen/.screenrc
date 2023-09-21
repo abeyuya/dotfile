@@ -20,4 +20,5 @@ bindkey -k kD stuff \177
 
 termcapinfo xterm* ti@:te@
 
-shell -$SHELL
+shell $SHELL
+
