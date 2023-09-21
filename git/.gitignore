@@ -1,19 +1,10 @@
 .DS_Store
 
-# rbenv
-.ruby-version
-
-# ctags
-tags
-
 # direnv
 .envrc
 
 # bundler
 .bundle
-
-# docker
-.docker-sync
 
 # npm
 npm-debug.log
