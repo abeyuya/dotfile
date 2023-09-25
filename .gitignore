@@ -1,7 +1,0 @@
-# 環境切り分け用
-/zsh/zshrc_homedir
-/zsh/path.zsh
-/git/.gitconfig
-
-# vim
-/vim/bundle/*
