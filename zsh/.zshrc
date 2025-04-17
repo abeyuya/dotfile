@@ -26,18 +26,10 @@ setopt list_types                                   # 補完候補にファイ�
 bindkey "^[[Z" reverse-menu-complete                # Shift-Tabで補完候補を逆順する("\e[Z"でも動作する)
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' # 補完時に大文字小文字を区別しない
 
-# 現在地表示
-autoload colors
-colors
-# PROMPT="%{${fg[yellow]}%}% [~] %{${reset_color}%} $ "
 
 #プロンプト
 autoload colors
 colors
-
-PROMPT="
-%{${fg[yellow]}%}%~%{${reset_color}%}
-[%T %n]$ "
 
 # ブランチ表示
 autoload -Uz vcs_info
@@ -48,7 +40,10 @@ precmd () {
     LANG=en_US.UTF-8 vcs_info
     [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
 }
-RPROMPT="%1(v|%F{green}%1v%f|)"
+
+PROMPT="
+%{${fg[yellow]}%}%~%{${reset_color}%} %1(v|%F{green}%1v%f|)
+[%T %n]$ "
 
 # direnv
 eval "$(direnv hook zsh)"
@@ -61,3 +56,6 @@ bindkey -e
 alias ll="ls -la"
 alias sc="/usr/bin/screen"
 alias rubyhttpd="ruby -run -e httpd . -p 3000"
+
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+
