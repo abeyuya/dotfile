@@ -15,12 +15,14 @@ cat >> "$CLAUDE_MD" <<'EOF'
 
 ##  デフォルトの挙動
 
-- PR を作成したら、確認なしで mcp__github__subscribe_pr_activity を呼んで監視を開始すること
+- PR を作成したら、確認なしで監視を開始すること
+  - Claude デスクトップアプリ (Code タブ) では `mcp__ccd_pr__get_status` で PR がセッションに紐付いているか確認し (無ければ `mcp__ccd_pr__bind_pr`)、`mcp__ccd_pr__set_monitor` で auto_fix / address_comments を ON にする
+  - それ以外の環境では `mcp__github__subscribe_pr_activity` を呼ぶ
   - 返信する場合は `> [AI 自動投稿] 無視してOK` と改行を先頭行に付与し、人間ではなくAIがコメントしていることを明示すること
 
 ### PR 監視の定期チェックイン (send_later) を無効化
 
-PR を監視 (`subscribe_pr_activity`) している間、`send_later` などで「1時間ごとの自己チェックイン」を仕込まないこと。
+PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_monitor`) している間、`send_later` などで「1時間ごとの自己チェックイン」を仕込まないこと。
 定期チェックインは発火のたびにセッションが起動してプッシュ通知が飛び、ノイズになるため。
 
 - **やらないこと**: `send_later` / スケジューラによる PR 状態の定期ポーリング
