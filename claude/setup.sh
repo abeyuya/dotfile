@@ -33,6 +33,13 @@ PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_moni
 - 例外: **私が明示的に「定期的にチェックして」「babysit して」と依頼した場合のみ**
   定期チェックインを設定してよい。その場合も間隔は私の指示に従うこと
 
+### PR レビューの別セッションへの委譲 (クラウドセッションのみ)
+
+- `mcp__claude-code-remote__create_session` が使えるセッション (クラウドセッション) で PR を作成したら、監視の開始に続けて、確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別セッションにレビューを委譲する
+  - skill が見つからないときや、skill が前提を満たさずに止まったときは、その旨を 1 行報告し、通常の PR 監視だけを続ける
+- 委譲したレビューセッションから `[delegate-pr-review:done]` / `[delegate-pr-review:failed]` で始まるメッセージが届いたら、同じ skill の Phase 2 で対応する
+- 委譲中の PR に AI レビュー (`AI-REVIEW-RESULT` 行を持つ Review) やその指摘コメントの webhook が届いたら、対応する前に skill の Phase 2「トリガー」を読み直し、その規則に従う (B の Review に監視と委譲の両方で二重に対応しないため)
+
 
 ### commit の自動化
 
@@ -89,6 +96,16 @@ PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_moni
 PR作成後に追加でpushを行う場合、最新のコードの状態に合わせてPRのタイトルやdescriptionを更新して
 
 EOF
+
+# 2) pr-review plugin を user scope にインストール (CLAUDE.md の delegate-pr-review 用)
+#    失敗してもセッションの起動を止めないよう WARN だけ出して続ける。
+#    curl | bash で実行されるため、stdin (= このスクリプトの残り) を読ませないよう /dev/null を渡す
+if command -v claude >/dev/null 2>&1; then
+  claude plugin install pr-review --marketplace abeyuya/skills --scope user -y </dev/null \
+    || echo "[setup] WARN: pr-review plugin install failed" >&2
+else
+  echo "[setup] WARN: claude CLI not found; skip pr-review plugin install" >&2
+fi
 
 # 3) ~/.claude/hooks/session-start.sh を生成
 mkdir -p "$HOME/.claude/hooks"
