@@ -17,7 +17,7 @@ cat >> "$CLAUDE_MD" <<'EOF'
 
 - PR を作成したら、確認なしで監視を開始すること
   - Claude デスクトップアプリ (Code タブ) では `mcp__ccd_pr__get_status` で PR がセッションに紐付いているか確認し (無ければ `mcp__ccd_pr__bind_pr`)、`mcp__ccd_pr__set_monitor` で auto_fix / address_comments を ON にする
-  - それ以外の環境では `mcp__github__subscribe_pr_activity` を呼ぶ
+  - それ以外の環境では `subscribe_pr_activity` を呼ぶ (MCP ツール。接頭辞は環境により `mcp__claude-code-remote__` / `mcp__github__` など)
   - 返信する場合は `> [AI 自動投稿] 無視してOK` と改行を先頭行に付与し、人間ではなくAIがコメントしていることを明示すること
 
 ### PR 監視の定期チェックイン (send_later) を無効化
@@ -32,6 +32,13 @@ PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_moni
 - CI 成功・マージ・コンフリクトの自動検知は行わない (それらは対応不要 or 私自身がマージ時に気づく状態のため、実害なし)
 - 例外: **私が明示的に「定期的にチェックして」「babysit して」と依頼した場合のみ**
   定期チェックインを設定してよい。その場合も間隔は私の指示に従うこと
+
+### PR レビューの別セッションへの委譲 (クラウドセッションのみ)
+
+- claude-code-remote の `create_session` / `send_message` / `get_session` が使えるセッション (クラウドセッション) で PR を作成したら、監視の開始に続けて、確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のセッション (レビューセッション) にレビューを委譲する
+  - skill が見つからないときや、skill が前提を満たさずに止まったときは、その旨を 1 行報告し、通常の PR 監視だけを続ける
+- レビューセッションから `[delegate-pr-review:done]` / `[delegate-pr-review:failed]` で始まるメッセージ、またはレビューセッションについての `<child-session-event>` が届いたら、同じ skill の Phase 2 で対応する
+- 委譲した PR では (委譲を終えた後も含む)、同じアカウントからの Review やコメントに対応する前に、それが webhook 経由でもデスクトップアプリの PR モニタ経由でも、skill の Phase 2「トリガー」を読み直してその規則に従う。レビューセッションの Review に、監視と委譲の両方で二重に対応しないため
 
 
 ### commit の自動化
@@ -89,6 +96,28 @@ PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_moni
 PR作成後に追加でpushを行う場合、最新のコードの状態に合わせてPRのタイトルやdescriptionを更新して
 
 EOF
+
+# 2) pr-review plugin を user scope にインストール (CLAUDE.md の delegate-pr-review 用)
+#    - 失敗や停止でセッションの起動を止めないよう、timeout を付けて WARN だけ出して続ける
+#      (timeout コマンドが無い環境では timeout なしで実行する)
+#    - 既に入っていると install は何もしないので、update で最新版にする
+#    - -y は付けない (marketplace が宣言したコマンドを無人で承認しない)
+#    - curl | bash で実行されるため、stdin (= このスクリプトの残り) を読ませないよう /dev/null を渡す
+run_with_timeout() {
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 90 "$@"
+  else
+    "$@"
+  fi
+}
+if command -v claude >/dev/null 2>&1; then
+  run_with_timeout claude plugin install pr-review --marketplace abeyuya/skills --scope user </dev/null \
+    || echo "[setup] WARN: pr-review plugin install failed" >&2
+  run_with_timeout claude plugin update pr-review@abeyuya-skills --scope user </dev/null \
+    || echo "[setup] WARN: pr-review plugin update failed" >&2
+else
+  echo "[setup] WARN: claude CLI not found; skip pr-review plugin install" >&2
+fi
 
 # 3) ~/.claude/hooks/session-start.sh を生成
 mkdir -p "$HOME/.claude/hooks"
