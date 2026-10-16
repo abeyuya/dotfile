@@ -1,49 +1,29 @@
 ## 全体的な指示
 
-- 日本語で返答して
 - ユーザーから「markdownで出して」「コピペ可能なmarkdownでちょうだい」のような指示があった場合、markdownファイルを書き出しそのファイルを表示すること
 - publicリポジトリに書き込み(PR作成、コメント等)する際、セッション内で得たprivateリポジトリに関する情報やその他機密事項については書き込みしないこと
-- ユーザーから「ファイルを表示して」のような指示があった場合、指示されたファイルを全文Readする。全文ReadすることチャットUI上にその内容が表示され、ユーザーは中身を確認することができる
 - subagent を使う場合は絶対に model を指定して。適切なモデルを使うようにして
-
 
 ##  デフォルトの挙動
 
 - PR を作成したら、確認なしで監視を開始すること
-  - Claude デスクトップアプリ (Code タブ) では `mcp__ccd_pr__get_status` で PR がセッションに紐付いているか確認し (無ければ `mcp__ccd_pr__bind_pr`)、`mcp__ccd_pr__set_monitor` で auto_fix / address_comments を ON にする
-  - それ以外の環境では `subscribe_pr_activity` を呼ぶ (MCP ツール。接頭辞は環境により `mcp__claude-code-remote__` / `mcp__github__` など)
   - 返信する場合は `> [AI 自動投稿] 無視してOK` と改行を先頭行に付与し、人間ではなくAIがコメントしていることを明示すること
 
-### PR 監視の定期チェックイン (send_later) を無効化
+### PR レビューの別セッションへの委譲
 
-PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_monitor`) している間、`send_later` などで「1時間ごとの自己チェックイン」を仕込まないこと。
-定期チェックインは発火のたびにセッションが起動してプッシュ通知が飛び、ノイズになるため。
-
-- **やらないこと**: `send_later` / スケジューラによる PR 状態の定期ポーリング
-  (CI 成功・マージ・コンフリクト遷移を取りこぼさないための heartbeat)
-- **やること**: webhook で届くイベント (CI 失敗・レビューコメント等) にのみ反応する
-  実際に PR で何か起きたときだけ動くので、通知は最小限になる
-- CI 成功・マージ・コンフリクトの自動検知は行わない (それらは対応不要 or 私自身がマージ時に気づく状態のため、実害なし)
-- 例外: **私が明示的に「定期的にチェックして」「babysit して」と依頼した場合のみ**
-  定期チェックインを設定してよい。その場合も間隔は私の指示に従うこと
-
-### PR レビューの別セッションへの委譲 (クラウドセッションのみ)
-
-- claude-code-remote の `create_session` / `send_message` / `get_session` が使えるセッション (クラウドセッション) で PR を作成したら、監視の開始に続けて、確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のセッション (レビューセッション) にレビューを委譲する
+- PR を作成したら、監視の開始に続けて確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のリモートセッション (レビューセッション) にレビューを委譲する
   - skill が見つからないときや、skill が前提を満たさずに止まったときは、その旨を 1 行報告し、通常の PR 監視だけを続ける
 - レビューセッションから `[delegate-pr-review:done]` / `[delegate-pr-review:failed]` で始まるメッセージ、またはレビューセッションについての `<child-session-event>` が届いたら、同じ skill の Phase 2 で対応する
 - 委譲した PR では (委譲を終えた後も含む)、同じアカウントからの Review やコメントに対応する前に、それが webhook 経由でもデスクトップアプリの PR モニタ経由でも、skill の Phase 2「トリガー」を読み直してその規則に従う。レビューセッションの Review に、監視と委譲の両方で二重に対応しないため
-
 
 ### commit の自動化
 
 - ファイル編集後に commit が必要だと判断したら、私に確認せずそのまま `git commit` してよい
 - commit メッセージも事前確認なしで Claude が決めてよい
-- ただし以下は引き続き禁止 / 要確認:
+- ただし以下は禁止 / 要確認:
   - main / master への直 `git push`
   - `git reset --hard` / `git rebase` / `git commit --amend` など履歴を書き換える操作
   - `.env` や credentials など秘密情報を含むファイルの commit
-
 
 ## git push 前のローカルレビュー (必須フロー)
 
