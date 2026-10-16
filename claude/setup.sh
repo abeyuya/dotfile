@@ -1,101 +1,18 @@
-# ~/.claude/CLAUDE.md に追記
+# 1) ~/.claude/CLAUDE.md に claude/CLAUDE.md の内容を追記
+#    - curl | bash で実行されるため、本文はリポジトリの master から取得する
+#    - 取得に失敗してもセッションの起動を止めないよう、WARN だけ出して続ける
+#    - 途中までの内容を書き込まないよう、一時ファイルに取得してから追記する
 CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+CLAUDE_MD_URL="https://raw.githubusercontent.com/abeyuya/dotfile/master/claude/CLAUDE.md"
 mkdir -p "$(dirname "$CLAUDE_MD")"
 touch "$CLAUDE_MD"
-cat >> "$CLAUDE_MD" <<'EOF'
-
-## 全体的な指示
-
-- 日本語で返答して
-- ユーザーから「markdownで出して」「コピペ可能なmarkdownでちょうだい」のような指示があった場合、markdownファイルを書き出しそのファイルを表示すること
-- publicリポジトリに書き込み(PR作成、コメント等)する際、セッション内で得たprivateリポジトリに関する情報やその他機密事項については書き込みしないこと
-- ユーザーから「ファイルを表示して」のような指示があった場合、指示されたファイルを全文Readする。全文ReadすることチャットUI上にその内容が表示され、ユーザーは中身を確認することができる
-- subagent を使う場合は絶対に model を指定して。適切なモデルを使うようにして
-
-
-##  デフォルトの挙動
-
-- PR を作成したら、確認なしで監視を開始すること
-  - Claude デスクトップアプリ (Code タブ) では `mcp__ccd_pr__get_status` で PR がセッションに紐付いているか確認し (無ければ `mcp__ccd_pr__bind_pr`)、`mcp__ccd_pr__set_monitor` で auto_fix / address_comments を ON にする
-  - それ以外の環境では `subscribe_pr_activity` を呼ぶ (MCP ツール。接頭辞は環境により `mcp__claude-code-remote__` / `mcp__github__` など)
-  - 返信する場合は `> [AI 自動投稿] 無視してOK` と改行を先頭行に付与し、人間ではなくAIがコメントしていることを明示すること
-
-### PR 監視の定期チェックイン (send_later) を無効化
-
-PR を監視 (`subscribe_pr_activity` / デスクトップアプリの `set_monitor`) している間、`send_later` などで「1時間ごとの自己チェックイン」を仕込まないこと。
-定期チェックインは発火のたびにセッションが起動してプッシュ通知が飛び、ノイズになるため。
-
-- **やらないこと**: `send_later` / スケジューラによる PR 状態の定期ポーリング
-  (CI 成功・マージ・コンフリクト遷移を取りこぼさないための heartbeat)
-- **やること**: webhook で届くイベント (CI 失敗・レビューコメント等) にのみ反応する
-  実際に PR で何か起きたときだけ動くので、通知は最小限になる
-- CI 成功・マージ・コンフリクトの自動検知は行わない (それらは対応不要 or 私自身がマージ時に気づく状態のため、実害なし)
-- 例外: **私が明示的に「定期的にチェックして」「babysit して」と依頼した場合のみ**
-  定期チェックインを設定してよい。その場合も間隔は私の指示に従うこと
-
-### PR レビューの別セッションへの委譲 (クラウドセッションのみ)
-
-- claude-code-remote の `create_session` / `send_message` / `get_session` が使えるセッション (クラウドセッション) で PR を作成したら、監視の開始に続けて、確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のセッション (レビューセッション) にレビューを委譲する
-  - skill が見つからないときや、skill が前提を満たさずに止まったときは、その旨を 1 行報告し、通常の PR 監視だけを続ける
-- レビューセッションから `[delegate-pr-review:done]` / `[delegate-pr-review:failed]` で始まるメッセージ、またはレビューセッションについての `<child-session-event>` が届いたら、同じ skill の Phase 2 で対応する
-- 委譲した PR では (委譲を終えた後も含む)、同じアカウントからの Review やコメントに対応する前に、それが webhook 経由でもデスクトップアプリの PR モニタ経由でも、skill の Phase 2「トリガー」を読み直してその規則に従う。レビューセッションの Review に、監視と委譲の両方で二重に対応しないため
-
-
-### commit の自動化
-
-- ファイル編集後に commit が必要だと判断したら、私に確認せずそのまま `git commit` してよい
-- commit メッセージも事前確認なしで Claude が決めてよい
-- ただし以下は引き続き禁止 / 要確認:
-  - main / master への直 `git push`
-  - `git reset --hard` / `git rebase` / `git commit --amend` など履歴を書き換える操作
-  - `.env` や credentials など秘密情報を含むファイルの commit
-
-
-## git push 前のローカルレビュー (必須フロー)
-
-**トリガー**: ユーザーから `git push` を実行するよう依頼されたとき、または自分で push しようとする直前。
-
-### ステップ1: commit
-
-未commitの変更がある場合はcommitする
-
-### ステップ2: /code-review スキル
-
-1. Skill ツール経由で `skill: "code-review"` を呼ぶ
-2. 指摘箇所について対応を検討
-3. 対応必要と判断した箇所について対応しcommitする
-
-### ステップ3: run-local-review Skillでのレビュー
-
-- `run-local-review` skill (Skill ツール経由で `skill: "run-local-review"` を呼ぶ)。
-  - `run-local-review` skill が利用できない場合はステップ3は飛ばして良い
-
-### ステップ4: レビューの終了
-
--「指摘ゼロ」または「残った指摘すべてについてユーザーと合意済み」の状態になるまでステップ2と3を繰り返す。
-- その状態に達してから `git push -u origin <branch>` を実行する。
-  - main / master / リリースブランチへの直 pushは禁止
-  - `--force` / `--force-with-lease` / 履歴改変 (rebase / amend after push) を伴う pushは禁止
-
-### ステップ5: PRの作成
-
-- .github/pull_request_template.md 等があればそのテンプレートに従ってPRを作成する
-- **PR は必ず draft で作成する**
-  - `gh pr create` を実行する際は **必ず** `--draft` フラグを付ける (例: `gh pr create --draft --title ... --body ...`)。
-
-### ローカルレビューのスキップ
-
-以下のいずれかに **完全に該当する** 場合は、トークン節約のためステップ 2と 3を共にスキップしてよい。スキップした旨と理由を 1 行で報告する (例:「diff は generated file のみ → simplify / review skip」)。
-
-   - 差分がコメント / 空白 / 改行 / import 並び替えのみ
-   - 差分が generated file のみ (`*.pbxproj`, `*.xcworkspacedata`, `Package.resolved`, lockfile 等)
-   - ファイルのリネーム / 移動のみで内容変更なし
-
-## PRへのpush後のタイトル・description等の更新
-
-PR作成後に追加でpushを行う場合、最新のコードの状態に合わせてPRのタイトルやdescriptionを更新して
-
-EOF
+claude_md_tmp=$(mktemp)
+if curl -fsSL --max-time 30 "$CLAUDE_MD_URL" -o "$claude_md_tmp"; then
+  { echo; cat "$claude_md_tmp"; } >> "$CLAUDE_MD"
+else
+  echo "[setup] WARN: failed to fetch $CLAUDE_MD_URL" >&2
+fi
+rm -f "$claude_md_tmp"
 
 # 2) pr-review plugin を user scope にインストール (CLAUDE.md の delegate-pr-review 用)
 #    - 失敗や停止でセッションの起動を止めないよう、timeout を付けて WARN だけ出して続ける
