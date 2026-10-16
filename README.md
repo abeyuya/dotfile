@@ -24,5 +24,5 @@ ln -s ./Documents/dev/dotfile/zsh/.zshrc .zshrc
   @~/Documents/dev/dotfile/claude/user-CLAUDE.md
   ```
   - `~/Documents/dev/dotfile` の作業ツリーをそのまま読むので、このチェックアウトは master のまま `git pull` で更新し、編集は worktree で行います (ブランチを切り替えたり未 commit の編集をしたりすると、ローカルの全セッションの指示が変わります)
-  - 書き換えた後は、新しいセッションの `/memory` で読み込まれていることを確認します
+  - 書き換えた後は、新しいセッションで指示が効いていることを確認します (CLI なら `/memory` で読み込まれたファイルを確認できます)
 - クラウドセッション: 起動時に `claude/setup.sh` が master の `claude/user-CLAUDE.md` を取得して `~/.claude/CLAUDE.md` に追記します (`setup.sh` はローカルでは実行しません)
