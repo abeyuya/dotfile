@@ -34,8 +34,9 @@
   - 撮影前にテスト用のデータに切り替えるかマスクして、個人情報・トークンなどの機密情報を写さない
   - スクリーンショットはリポジトリの外 (scratchpad など) に保存し、commit しない
   - 撮影できなかった画面があれば、その画面名と理由を PR 本文に書く
-  - GitHub には PR 本文に画像を添付する API や gh のコマンドが無く、エージェントからは直接添付できない。画像ファイルをユーザーに送り (SendUserFile が使えればそれで)、添付を依頼する。添付のために画像を commit したり外部に上げたりはしない。送る手段もなければ、撮影できなかった画面と同じく PR 本文にその旨を書く
-- PR 作成後の push で UI が変わったら、該当画面の after を撮り直して差し替える
+  - 添付は gh の `--attach` で行う (`gh pr create` / `gh pr edit` / `gh pr comment` で使える)。本文に `![before: <画面名>](<ローカルのパス>)` のように書いて `--body-file` と一緒に渡すと、アップロードされた画像の URL に書き換わる (例: `gh pr create --draft --body-file <本文> --attach <before.png> --attach <after.png>`)
+  - `--attach` が使えない (gh が古い・push 権限が無い等) ときは、画像ファイルをユーザーに送り (SendUserFile が使えればそれで)、添付を依頼する。添付のために画像を commit したり外部に上げたりはしない。送る手段もなければ、撮影できなかった画面と同じく PR 本文にその旨を書く
+- PR 作成後の push で UI が変わったら、該当画面の after を撮り直し、`gh pr edit --body-file <本文> --attach <after.png>` で差し替える
 
 ## git push 前のローカルレビュー (必須フロー)
 
