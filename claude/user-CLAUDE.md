@@ -34,8 +34,8 @@
   - 撮影前にテスト用のデータに切り替えるかマスクして、個人情報・トークンなどの機密情報を写さない
   - スクリーンショットはリポジトリの外 (scratchpad など) に保存し、commit しない
   - 撮影できなかった画面があれば、その画面名と理由を PR 本文に書く
-  - 添付は gh の `--attach` で行う (`gh pr create` / `gh pr edit` / `gh pr comment` で使える)。本文に `![before: <画面名>](<ローカルのパス>)` のように書いて `--body-file` と一緒に渡すと、アップロードされた画像の URL に書き換わる (例: `gh pr create --draft --body-file <本文> --attach <before.png> --attach <after.png>`)
-    - 添付が一部失敗しても PR の作成・更新は行われ、終了コードだけが非ゼロになる。そのときは `gh pr create` をやり直さず、PR 本文を確認して `gh pr edit --attach` で足りない画像を添付し直す
+  - 添付は gh の `--attach` で行う (`gh pr create` / `gh pr edit` / `gh pr comment` で使える)。本文に `![before: <画面名>](<ローカルのパス>)` のように書いて `--body-file` と一緒に渡すと、アップロードされた画像の URL に書き換わる (例: `gh pr create --draft --body-file <本文> --attach <before.png> --attach <after.png>`)。本文のパスと `--attach` のパスは同じ書き方にそろえる (違うと参照が書き換わらず、画像が本文の末尾に付く)
+    - 添付が一部失敗しても PR の作成・更新は行われ、終了コードだけが非ゼロになる。そのときは `gh pr create` をやり直さず、下の after の差し替えと同じ手順で、足りない画像を添付し直す
   - `--attach` が使えない (gh が古い・push 権限が無い等) ときは、画像ファイルをユーザーに送り (SendUserFile が使えればそれで)、添付を依頼する。添付のために画像を commit したり外部に上げたりはしない。送る手段もなければ、撮影できなかった画面と同じく PR 本文にその旨を書く
 - PR 作成後の push で UI が変わったら、該当画面の after を撮り直して差し替える。`gh pr view --json body -q .body` で今の本文を取り、差し替える after の参照だけをローカルのパスに書き換えて、`gh pr edit --body-file <本文> --attach <after.png>` で更新する (`--body-file` は本文全体を置き換えるので、今の本文を元にしないと添付済みの before が消える)
 
