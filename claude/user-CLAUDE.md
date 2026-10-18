@@ -31,7 +31,7 @@
   - before は PR のベースブランチのコードで、after は PR のブランチのコードで、同じ画面・同じ状態を撮影して並べる
   - スクリーンショットでは確認しにくい変更 (動き・アニメーション・画面遷移、ホバーやスクロールなどの操作に伴う変化) は、代わりに before / after の動画を撮って添付する。以下の撮影・保存・添付の規則は、動画にも同じように適用する
     - 形式は `.mp4` / `.mov` / `.webm` (H.264 の `.mp4` が最も互換性が高い)。サイズの上限は無料プランのリポジトリで 10MB、有料プランで 100MB。超えるときは、確認したい操作の範囲に絞って撮り直すか、解像度を下げて再エンコードする (例: macOS 標準の `avconvert -s in.mov -p Preset1280x720 -o out.mp4`。ffmpeg があれば `ffmpeg -i in.mov -vf scale=-2:720 -c:v libx264 -crf 28 -an out.mp4`)
-    - 録画の手段は環境に合わせる (例: iOS シミュレータは `xcrun simctl io booted recordVideo --codec=h264 <path>.mp4` を SIGINT で止める。ブラウザは Playwright の動画録画)
+    - 録画の手段は環境に合わせる (例: iOS シミュレータは `xcrun simctl io booted recordVideo --codec=h264 <path>.mov` を SIGINT で止める (QuickTime 形式で書き出されるので拡張子は `.mov` にする)。ブラウザは Playwright の動画録画)
     - 本文には動画の参照 `![](<ローカルのパス>)` だけを 1 つの段落に単独で書く (同じ段落に文があると、プレーヤーではなくリンクとして表示される)。動画には代替テキストを付けられないので、何の動画かは直前の段落に書く
     - 録画できないときは、スクリーンショットを撮り、動きの違いを文章で補う
   - before は UI を変更する前に撮っておく。撮り忘れたときは、`git fetch origin <ベースブランチ>` のあと `git worktree add --detach <path> origin/<ベースブランチ>` でベースブランチを別の場所に出して撮り、撮り終えたら `git worktree remove` で片付ける (作業中のブランチの切り替えや `git stash` はしない)
