@@ -25,6 +25,25 @@
   - `git reset --hard` / `git rebase` / `git commit --amend` など履歴を書き換える操作
   - `.env` や credentials など秘密情報を含むファイルの commit
 
+### UI 変更を含む PR のスクリーンショット・動画
+
+- UI の変更を含む PR を作成する場合は、変更の影響を受ける画面すべてについて before / after のスクリーンショットを極力撮影し、PR に添付する
+  - before は PR のベースブランチのコードで、after は PR のブランチのコードで、同じ画面・同じ状態を撮影して並べる
+  - スクリーンショットでは確認しにくい変更 (動き・アニメーション・画面遷移、ホバーやスクロールなどの操作に伴う変化) は、代わりに before / after の動画を撮って添付する。以下の撮影・保存・添付の規則は、動画にも同じように適用する
+    - 形式は `.mp4` / `.mov` / `.webm` (H.264 の `.mp4` が最も互換性が高い)。サイズの上限は無料プランのリポジトリで 10MB、有料プランで 100MB。超えるときは、確認したい操作の範囲に絞って撮り直すか、解像度を下げて再エンコードする (例: macOS 標準の `avconvert -s in.mov -p Preset1280x720 -o out.mp4`。ffmpeg があれば `ffmpeg -i in.mov -vf scale=-2:720 -c:v libx264 -crf 28 -an out.mp4`)
+    - 録画の手段は環境に合わせる (例: iOS シミュレータは `xcrun simctl io booted recordVideo --codec=h264 <path>.mov` を SIGINT で止める (QuickTime 形式で書き出されるので拡張子は `.mov` にする)。ブラウザは Playwright の動画録画)
+    - 本文には動画の参照 `![](<ローカルのパス>)` だけを 1 つの段落に単独で書く (同じ段落に文があると、プレーヤーではなくリンクとして表示される)。動画には代替テキストを付けられないので、何の動画かは直前の段落に書く
+    - 録画できないときは、スクリーンショットを撮り、動きの違いを文章で補う
+  - before は UI を変更する前に撮っておく。撮り忘れたときは、`git fetch origin <ベースブランチ>` のあと `git worktree add --detach <path> origin/<ベースブランチ>` でベースブランチを別の場所に出して撮り、撮り終えたら `git worktree remove` で片付ける (作業中のブランチの切り替えや `git stash` はしない)
+    - `<path>` はリポジトリの外 (scratchpad など) にする。新しい worktree では、依存のインストールやビルドをし直してからアプリを起動する
+  - 撮影前にテスト用のデータに切り替えるかマスクして、個人情報・トークンなどの機密情報を写さない
+  - スクリーンショットはリポジトリの外 (scratchpad など) に保存し、commit しない
+  - 撮影できなかった画面があれば、その画面名と理由を PR 本文に書く
+  - 添付は gh の `--attach` で行う (`gh pr create` / `gh pr edit` / `gh pr comment` で使える)。本文に `![before: <画面名>](<ローカルのパス>)` のように書いて `--body-file` と一緒に渡すと、アップロードされた画像の URL に書き換わる (例: `gh pr create --draft --body-file <本文> --attach <before.png> --attach <after.png>`)。本文のパスと `--attach` のパスは同じ書き方にそろえる (違うと参照が書き換わらず、画像が本文の末尾に付く)
+    - 添付が一部失敗しても PR の作成・更新は行われ、終了コードだけが非ゼロになる。そのときは `gh pr create` をやり直さず、下の after の差し替えと同じ手順で、足りない画像を添付し直す
+  - `--attach` が使えない (gh が古い・push 権限が無い等) ときは、画像ファイルをユーザーに送り (SendUserFile が使えればそれで)、添付を依頼する。添付のために画像を commit したり外部に上げたりはしない。送る手段もなければ、撮影できなかった画面と同じく PR 本文にその旨を書く
+- PR 作成後の push で UI が変わったら、該当画面の after を撮り直して差し替える。`gh pr view --json body -q .body` で今の本文を取り、差し替える after の参照だけをローカルのパスに書き換えて、`gh pr edit --body-file <本文> --attach <after.png>` で更新する (`--body-file` は本文全体を置き換えるので、今の本文を元にしないと添付済みの before が消える)
+
 ## git push 前のローカルレビュー (必須フロー)
 
 **トリガー**: ユーザーから `git push` を実行するよう依頼されたとき、または自分で push しようとする直前。
@@ -56,6 +75,7 @@
 - .github/pull_request_template.md 等があればそのテンプレートに従ってPRを作成する
 - **PR は必ず draft で作成する**
   - `gh pr create` を実行する際は **必ず** `--draft` フラグを付ける (例: `gh pr create --draft --title ... --body ...`)。
+- UI の変更を含む PR では「UI 変更を含む PR のスクリーンショット・動画」にも従う
 
 ### ローカルレビューのスキップ
 
