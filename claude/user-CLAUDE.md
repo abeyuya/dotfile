@@ -58,9 +58,9 @@
 ## PRの作成
 
 - .github/pull_request_template.md 等があればそのテンプレートに従ってPRを作成する
-  - PRのフォーマット指示が何もない場合 `skill: "pr-template"` を利用する
-  - PR 本文に図 (mermaid / 画像) を載せるときは `pr-diagrams` skill (Skill ツール経由で `skill: "pr-diagrams"`) の手順に従う
-  - UI の変更を含む作業では、UI を変更する前 (before の撮影)、PR を作るとき、push 後に description を更新するときに `pr-screenshots` skill (Skill ツール経由で `skill: "pr-screenshots"`) の手順に従い、before / after のスクリーンショット・動画を載せる (添付済みの画像を消さない更新の仕方も skill にある)
+  - PRのフォーマット指示が何もない場合 `pr-template` skill (Skill ツール経由で `skill: "pr-template"`、plugin 経由では `pr-create:pr-template`) を利用する
+  - PR 本文に図 (mermaid / 画像) を載せるときは `pr-diagrams` skill (Skill ツール経由で `skill: "pr-diagrams"`、plugin 経由では `pr-create:pr-diagrams`) の手順に従う
+  - UI の変更を含む作業では、UI を変更する前 (before の撮影)、PR を作るとき、push 後に description を更新するときに `pr-screenshots` skill (Skill ツール経由で `skill: "pr-screenshots"`、plugin 経由では `pr-create:pr-screenshots`) の手順に従い、before / after のスクリーンショット・動画を載せる (添付済みの画像を消さない更新の仕方も skill にある)
 - **PR は必ず draft で作成する**
   - `gh pr create` を実行する際は **必ず** `--draft` フラグを付ける (例: `gh pr create --draft --title ... --body ...`)。
 - PR を作成したら、確認なしで監視を開始すること
