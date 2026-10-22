@@ -30,6 +30,7 @@ fi
 #    - 失敗や停止でセッションの起動を止めないよう、timeout を付けて WARN だけ出して続ける
 #      (timeout コマンドが無い環境では timeout なしで実行する)
 #    - 既に入っていると install は何もしないので、update で最新版にする
+#      (install に失敗したら update も失敗するだけなので飛ばす)
 #    - -y は付けない (marketplace が宣言したコマンドを無人で承認しない)
 #    - curl | bash で実行されるため、stdin (= このスクリプトの残り) を読ませないよう /dev/null を渡す
 run_with_timeout() {
@@ -42,7 +43,7 @@ run_with_timeout() {
 if command -v claude >/dev/null 2>&1; then
   for plugin in pr-review pr-create; do
     run_with_timeout claude plugin install "$plugin" --marketplace abeyuya/skills --scope user </dev/null \
-      || echo "[setup] WARN: $plugin plugin install failed" >&2
+      || { echo "[setup] WARN: $plugin plugin install failed" >&2; continue; }
     run_with_timeout claude plugin update "$plugin@abeyuya-skills" --scope user </dev/null \
       || echo "[setup] WARN: $plugin plugin update failed" >&2
   done
