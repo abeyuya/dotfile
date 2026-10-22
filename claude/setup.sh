@@ -24,7 +24,9 @@ else
   echo "[setup] WARN: failed to fetch $CLAUDE_MD_URL" >&2
 fi
 
-# 2) pr-review plugin を user scope にインストール (CLAUDE.md の delegate-pr-review 用)
+# 2) abeyuya/skills の plugin を user scope にインストール
+#    - pr-review: CLAUDE.md の delegate-pr-review 用
+#    - pr-create: PR 作成時の pr-template / pr-screenshots / pr-diagrams 用
 #    - 失敗や停止でセッションの起動を止めないよう、timeout を付けて WARN だけ出して続ける
 #      (timeout コマンドが無い環境では timeout なしで実行する)
 #    - 既に入っていると install は何もしないので、update で最新版にする
@@ -38,12 +40,14 @@ run_with_timeout() {
   fi
 }
 if command -v claude >/dev/null 2>&1; then
-  run_with_timeout claude plugin install pr-review --marketplace abeyuya/skills --scope user </dev/null \
-    || echo "[setup] WARN: pr-review plugin install failed" >&2
-  run_with_timeout claude plugin update pr-review@abeyuya-skills --scope user </dev/null \
-    || echo "[setup] WARN: pr-review plugin update failed" >&2
+  for plugin in pr-review pr-create; do
+    run_with_timeout claude plugin install "$plugin" --marketplace abeyuya/skills --scope user </dev/null \
+      || echo "[setup] WARN: $plugin plugin install failed" >&2
+    run_with_timeout claude plugin update "$plugin@abeyuya-skills" --scope user </dev/null \
+      || echo "[setup] WARN: $plugin plugin update failed" >&2
+  done
 else
-  echo "[setup] WARN: claude CLI not found; skip pr-review plugin install" >&2
+  echo "[setup] WARN: claude CLI not found; skip abeyuya/skills plugin install" >&2
 fi
 
 # 3) ~/.claude/hooks/session-start.sh を生成
