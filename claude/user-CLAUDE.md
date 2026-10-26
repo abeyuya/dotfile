@@ -69,7 +69,7 @@
 
 ### PR レビューの別セッションへの委譲
 
-- PRを作成したら監視を開始し、CIが全てパスしたら私への確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のリモートセッション (レビューセッション) にレビューを委譲する
+- PRを作成したら監視を開始し、そのまま私への確認なしで `delegate-pr-review` skill (plugin 経由では `pr-review:delegate-pr-review`) を呼び、別のリモートセッション (レビューセッション) にレビューを委譲する
   - skill が見つからないときや、skill が前提を満たさずに止まったときは、その旨を 1 行報告し、通常の PR 監視だけを続ける
 「ローカルレビューのスキップ」と同じ条件に該当する場合はトークン節約のため別セッションでのレビューはスキップして良い
 - レビューセッションから `[delegate-pr-review:done]` / `[delegate-pr-review:failed]` で始まるメッセージ、またはレビューセッションについての `<child-session-event>` が届いたら、同じ skill の Phase 2 で対応する
